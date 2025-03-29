@@ -24,9 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (data.success) {
           resultado.innerHTML = `
             <p><strong>Carnet encontrado:</strong></p>
-            <a href="${data.url}" target="_blank">Ver carnet en PDF</a>
-            <br/>
-            <iframe src="${data.url}" width="100%" height="600px" style="margin-top:20px; border:1px solid #ccc;"></iframe>
+            <a href="${data.url}" target="_blank" class="boton-descarga">Ver carnet en PDF</a>
           `;
         } else {
           resultado.innerHTML = `<p style="color:red;">${data.message}</p>`;
