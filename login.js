@@ -1,56 +1,39 @@
-document.getElementById("loginForm").addEventListener("submit", function(e) {
-  e.preventDefault();
-  const user = document.getElementById("usuario").value.trim();
-  const pass = document.getElementById("clave").value.trim();
-
-  if (user === "admin" && pass === "acceso123") {
-    alert("¡Bienvenido!");
-
-    // Ocultar login y mostrar formulario
-    document.querySelector(".login-wrapper").style.display = "none";
-    document.getElementById("registroCarnet").style.display = "flex";
-  } else {
-    alert("Usuario o contraseña incorrectos.");
-  }
-});
-
-
 document.addEventListener("DOMContentLoaded", function () {
-  const formCarnet = document.getElementById("formCarnet");
+  const loginForm = document.getElementById("loginForm");
+  const resultado = document.getElementById("resultadoCarnet");
 
-  if (formCarnet) {
-    formCarnet.addEventListener("submit", async function (e) {
+  if (loginForm) {
+    loginForm.addEventListener("submit", async function (e) {
       e.preventDefault();
 
-      const nombre = document.getElementById("nombre").value.trim();
       const dni = document.getElementById("dni").value.trim();
-      const especialidad = document.getElementById("especialidad").value.trim();
+      const mail = document.getElementById("mail").value.trim();
 
-      if (!nombre || !dni || !especialidad) {
-        alert("Por favor, completá todos los campos.");
+      if (!dni || !mail) {
+        alert("Por favor, ingresá tu DNI y correo.");
         return;
       }
 
-      const datos = { nombre, dni, especialidad };
+      const endpoint = "https://script.google.com/macros/s/AKfycbxFDVxtTsvuQSreQPmlkMDzS4p11mbcTw5XLrkgvkyaLYCqMhBRWUbaiKzt6Xw-F9KD/exec";
+      const url = `${endpoint}?dni=${dni}&mail=${encodeURIComponent(mail)}`;
 
       try {
-        const response = await fetch("https://script.google.com/macros/s/AKfycbxxBcd-wMzJp5lf_Uc6lCnyp662GiiNbSYAMBFFLmTU__sO_pRgSr16ub00_pW_skCy/exec", {
-          method: "POST",
-          body: JSON.stringify(datos),
-          headers: {
-            "Content-Type": "application/json"
-          }
-        });
+        const response = await fetch(url);
+        const data = await response.json();
 
-        if (response.ok) {
-          alert("¡Datos enviados con éxito!");
-          formCarnet.reset();
+        if (data.success) {
+          resultado.innerHTML = `
+            <p><strong>Carnet encontrado:</strong></p>
+            <a href="${data.url}" target="_blank">Ver carnet en PDF</a>
+            <br/>
+            <iframe src="${data.url}" width="100%" height="600px" style="margin-top:20px; border:1px solid #ccc;"></iframe>
+          `;
         } else {
-          alert("Error al enviar los datos.");
+          resultado.innerHTML = `<p style="color:red;">${data.message}</p>`;
         }
       } catch (err) {
         console.error("Error:", err);
-        alert("Hubo un problema al conectar con el servidor.");
+        resultado.innerHTML = `<p style="color:red;">Hubo un problema al conectar con el servidor.</p>`;
       }
     });
   }
